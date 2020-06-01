@@ -1,0 +1,20 @@
+[[source]]
+verify_ssl = true
+url = "https://pypi.org/simple"
+name = "pypi"
+
+[requires]
+python_version = "3.7"
+
+[packages]
+django = ">=3.0"
+djangorestframework = "~=3.11.0"
+celery = {version = "~=4.3,<4.4",extras = ["redis"]}
+django-extensions = "*"
+"psycopg2-binary" = "==2.7.6.1"
+"boto3" = "*"
+requests = "*"
+django-celery-beat = "~=1.4.0"
+drf-yasg = "~=1.12.1"
+elasticsearch = "~=6.3.1"
+drf-nested-routers = "*"

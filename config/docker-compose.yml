@@ -1,0 +1,50 @@
+version: "3"
+services:
+  database:
+    image: postgres:9.5
+    hostname: ${POSTGRES_HOST}
+    container_name: when-database
+    environment:
+        POSTGRES_DB: ${POSTGRES_DATABASE}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - database:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - ${POSTGRES_PORT}:5432
+    networks:
+      - when-network
+
+  front:
+    image: python:latest
+    command: "python -m http.server 3000"
+    networks:
+      - when-network
+  api:
+    build:
+      context: ..
+    networks:
+      - when-network
+    ports:
+      - 8000:8000
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - POSTGRES_HOST=database
+
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - when-network
+
+volumes:
+  database:
+
+networks:
+  when-network:
