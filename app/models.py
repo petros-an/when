@@ -1,7 +1,8 @@
 from django.contrib.postgres.fields import JSONField, ArrayField
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 
 
 class Category(models.Model):
@@ -29,17 +30,21 @@ class Event(models.Model):
     description = models.TextField()
     info = JSONField(default=dict, blank=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    prevalent_when = models.ForeignKey(to="When", on_delete=models.CASCADE, related_name="prevalent_when", null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     score = models.FloatField(default=0)
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, null=True, to_field="slug")
     status = models.CharField(max_length=50, choices=status_choices, default='accepted')
 
+    class Meta:
+        indexes = [
+            GinIndex(fields=["title", "description"])
+        ]
+
+
     def __str__(self):
         return self.title
 
-    @property
-    def prevalent_when(self):
-        return self.whens.all().order_by('-score').first()
 
 
 class Subscription(models.Model):
@@ -102,10 +107,12 @@ class When(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     sources = ArrayField(default=list, base_field=models.URLField(), blank=True)
     score = models.FloatField(default=0)
-    verified = models.BooleanField(default=False)
+    chosen = models.BooleanField(default=False)
     confidence = models.CharField(max_length=40, choices=confidence_choices, default='probably')
     status = models.CharField(max_length=50, choices=status_choices, default='accepted')
     when = models.DateTimeField()
+
+
 
     def __str__(self):
         return f"{self.event.title} : {self.confidence} on {self.when.__str__()} - {self.score}"
@@ -119,3 +126,7 @@ class NotificationAttempt(models.Model):
 
     def __str__(self):
         return f"Notified {self.subscription.user.username} for {self.subscription.event.title} at {self.created}"
+
+class PowerUser(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)

@@ -6,13 +6,16 @@ from app.serializers.whens import WhenRetrieveSerializer
 
 class EventRetrieveSerializer(serializers.ModelSerializer):
     whens = WhenRetrieveSerializer(many=True)
-    vote_count = serializers.IntegerField(read_only=True)
     prevalent_when = WhenRetrieveSerializer()
 
     class Meta:
         model = Event
         fields = "__all__"
 
+class EventAutocompleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ["title", "category"]
 
 class EventCreateSerializer(serializers.ModelSerializer):
 

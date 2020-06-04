@@ -132,4 +132,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+# Celery settings
+
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "when")
+REDIS_PORT = os.getenv("REDIS_PORT", 6379)
+
+CELERY_BROKER_URL = BROKER_URL = f"redis://{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
+
 CELERY_ALWAYS_EAGER = CELERY_TASK_ALWAYS_EAGER = True

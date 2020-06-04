@@ -1,6 +1,13 @@
+from django.contrib.postgres.search import SearchVector
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from app.models import When
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+
+from app.models import When, Event, PowerUser
 from app.serializers.whens import WhenRetrieveSerializer, WhenCreateSerializer, WhenUpdateSerializer
+from app.tasks import initiate_notifications_for_prevalent_when_change
 
 
 class EventWhenViewset(viewsets.ModelViewSet):
@@ -18,4 +25,28 @@ class EventWhenViewset(viewsets.ModelViewSet):
             return WhenCreateSerializer(*args, **kwargs, context=context)
         elif self.action == 'update' or self.action == 'partial_update':
             return WhenUpdateSerializer(*args, **kwargs, context=context)
+
+    @action(detail=True, methods=["POST"], url_path="choose")
+    def choose(self, request, *args, **kwargs):
+        try:
+            when = When.objects.select_related("event").get(
+                event_id=self.kwargs["event_pk"],
+                id=self.kwargs["pk"]
+            )
+        except When.DoesNotExist:
+            raise Http404
+
+        # if not PowerUser.objects.filter(user_id=request.user_id).exists():
+        #     raise PermissionDenied("Only Power users can choose")
+        when.event.prevalent_when = when
+        when.event.save()
+        initiate_notifications_for_prevalent_when_change.apply_async(when.event.id)
+        return JsonResponse(status=200, data={})
+
+
+
+
+
+
+
 

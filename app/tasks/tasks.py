@@ -28,13 +28,7 @@ def initiate_due_notifications_for_all_deltas():
 @celery_app.task
 def initiate_due_notifications_for_delta(delta_name):
     delta_value = SUBSCRIPTION_TIMEDELTAS[delta_name]
-    whens_due = When.objects.order_by(
-        "event_id", "-score"
-    ).distinct(
-        "event_id"
-    ).select_related(
-        "event"
-    ).filter(
+    whens_due = When.objects.prefetch_related("prevalent_when").filter(
         when__lte=timezone.now() + delta_value,
         when__gte=timezone.now()
     )
@@ -46,7 +40,7 @@ def initiate_due_notifications_for_delta(delta_name):
             notify_subscription_for_delta.apply_async((subscription.id, delta_name))
 
 
-@celery_app.task()
+@celery_app.task
 def notify_subscription_for_delta(subscription_id, delta_name):
     delta = SUBSCRIPTION_TIMEDELTAS[delta_name]
     try:
@@ -68,8 +62,10 @@ def notify_subscription_for_delta(subscription_id, delta_name):
     else:
         raise NotImplementedError("Notification method not implemented")
 
-def initiate_notifications_for_change(event_id):
-    pass
+def initiate_notifications_for_prevalent_when_change(event_id):
+    event = Event.objects.select_related("prevalent_when").get(id=event_id)
+    for subscription in event.subscriptions.filter(config__notify_on_change=True):
+        notify_by_email(subscription)
 
 
 def notify_by_email(subscription):
