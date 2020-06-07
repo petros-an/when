@@ -11,6 +11,14 @@ class WhenRetrieveSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class WhenStringSerializer(serializers.ModelSerializer):
+    when = serializers.DateTimeField()
+
+    class Meta:
+        model = When
+        fields = ["when"]
+
+
 class WhenCreateSerializer(serializers.ModelSerializer):
     when = serializers.DateTimeField()
     description = serializers.CharField(max_length=200)

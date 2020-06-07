@@ -12,10 +12,12 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
         model = Event
         fields = "__all__"
 
+
 class EventAutocompleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ["title", "category"]
+
 
 class EventCreateSerializer(serializers.ModelSerializer):
 

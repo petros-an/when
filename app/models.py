@@ -35,6 +35,7 @@ class Event(models.Model):
     score = models.FloatField(default=0)
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, null=True, to_field="slug")
     status = models.CharField(max_length=50, choices=status_choices, default='accepted')
+    image = models.ImageField(null=True, blank=True)
 
     class Meta:
         indexes = [
