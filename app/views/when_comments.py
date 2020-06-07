@@ -4,9 +4,10 @@ from rest_framework.viewsets import GenericViewSet
 
 from app.models import WhenComment
 from app.serializers import WhenCommentRetrieveSerializer, WhenCommentCreateSerializer
+from app.views.mixins import AllowAnyForRead
 
 
-class WhenCommentsViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
+class WhenCommentsViewSet(AllowAnyForRead, GenericViewSet, ListModelMixin, CreateModelMixin, RetrieveModelMixin):
 
     def get_serializer_context(self):
         parent = super().get_serializer_context()

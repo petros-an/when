@@ -2,15 +2,18 @@ from django.contrib.postgres.search import SearchVector
 from django.db.models import Prefetch, Count
 from django.http import JsonResponse
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.authentication import BasicAuthentication, TokenAuthentication
+from rest_framework.decorators import action, authentication_classes, permission_classes
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny
 
 from app.models import Event, When
 from app.serializers.events import EventRetrieveSerializer, EventCreateSerializer, EventUpdateSerializer, \
     EventAutocompleteSerializer
+from app.views.mixins import AllowAnyForRead
 
 
-class EventViewset(viewsets.ModelViewSet):
+class EventViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Event.objects.filter(status='accepted').prefetch_related(
@@ -22,7 +25,7 @@ class EventViewset(viewsets.ModelViewSet):
         category = self.kwargs.get('category')
         if category:
             qs = qs.filter(category=category)
-        return qs
+        return qs.order_by("-created")
 
     def get_serializer(self, *args, **kwargs):
         context = self.get_serializer_context()
@@ -38,7 +41,8 @@ class EventViewset(viewsets.ModelViewSet):
         instance.save()
 
 
-class EventAutocompleteView(ListAPIView):
+class EventAutocompleteView(AllowAnyForRead, ListAPIView):
+
     def get_queryset(self):
         term = self.request.GET.get("term") or ""
         queryset = Event.objects.filter(
@@ -49,7 +53,9 @@ class EventAutocompleteView(ListAPIView):
     serializer_class = EventAutocompleteSerializer
 
 
-class EventSearchView(ListAPIView):
+class EventSearchView(AllowAnyForRead, ListAPIView):
+    permission_classes = (AllowAny,)
+
     def get_queryset(self):
         search = self.request.GET.get("search")
         queryset = Event.objects.annotate(
