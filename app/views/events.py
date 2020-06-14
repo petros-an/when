@@ -1,5 +1,5 @@
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, Q
 from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
@@ -57,10 +57,10 @@ class EventSearchView(AllowAnyForRead, ListAPIView):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        search = self.request.GET.get("search")
+        search = self.request.GET.get("term")
         queryset = Event.objects.annotate(
             search=SearchVector('description', 'title'),
-        ).filter(search=search)
+        ).filter(Q(search=search) | Q(title__istartswith=search))
         return queryset
 
     serializer_class = EventRetrieveSerializer

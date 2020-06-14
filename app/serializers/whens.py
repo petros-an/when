@@ -4,7 +4,10 @@ from app.models import When
 
 
 class WhenRetrieveSerializer(serializers.ModelSerializer):
-    when = serializers.DateTimeField()
+    when = serializers.SerializerMethodField(method_name="get_when")
+
+    def get_when(self, obj):
+        return int(obj.when.timestamp())
 
     class Meta:
         model = When
@@ -23,6 +26,7 @@ class WhenCreateSerializer(serializers.ModelSerializer):
     when = serializers.DateTimeField()
     description = serializers.CharField(max_length=200)
     sources = serializers.JSONField()
+    specificity = serializers.ChoiceField(choices=When.specificity_choices)
 
     def create(self, validated_data):
         validated_data["event_id"] = self.context["view"].kwargs["event_pk"]
@@ -31,7 +35,7 @@ class WhenCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = When
-        fields = ["when", "description", "sources"]
+        fields = ["when", "description", "sources", "specificity"]
 
 
 class WhenUpdateSerializer(serializers.ModelSerializer):

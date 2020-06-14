@@ -16,7 +16,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
 class EventAutocompleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ["title", "category"]
+        fields = ["id", "title", "category"]
 
 
 class EventCreateSerializer(serializers.ModelSerializer):

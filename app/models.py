@@ -22,15 +22,16 @@ class Category(models.Model):
 class Event(models.Model):
     status_choices = (
         ('accepted', 'Accepted'),
-        ('flagged', 'Accepted'),
-        ('deleted', 'Accepted')
+        ('flagged', 'Flagged'),
+        ('deleted', 'Deleted')
     )
 
     title = models.CharField(max_length=120)
     description = models.TextField()
     info = JSONField(default=dict, blank=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    prevalent_when = models.ForeignKey(to="When", on_delete=models.CASCADE, related_name="prevalent_when", null=True, blank=True)
+    prevalent_when = models.ForeignKey(to="When", on_delete=models.CASCADE, related_name="prevalent_when", null=True,
+                                       blank=True)
     created = models.DateTimeField(auto_now_add=True)
     score = models.FloatField(default=0)
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, null=True, to_field="slug")
@@ -42,10 +43,8 @@ class Event(models.Model):
             GinIndex(fields=["title", "description"])
         ]
 
-
     def __str__(self):
         return self.title
-
 
 
 class Subscription(models.Model):
@@ -102,6 +101,13 @@ class When(models.Model):
         ('deleted', 'Accepted')
     )
 
+    specificity_choices = (
+        ('year', 'Year'),
+        ('season', 'Season'),
+        ('month', 'Month'),
+        ('day', 'Day')
+    )
+
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     description = models.TextField()
     event = models.ForeignKey(to=Event, related_name='whens', on_delete=models.CASCADE)
@@ -112,8 +118,7 @@ class When(models.Model):
     confidence = models.CharField(max_length=40, choices=confidence_choices, default='probably')
     status = models.CharField(max_length=50, choices=status_choices, default='accepted')
     when = models.DateTimeField()
-
-
+    specificity = models.CharField(choices=specificity_choices, max_length=100, default='day')
 
     def __str__(self):
         return f"{self.event.title} : {self.confidence} on {self.when.__str__()} - {self.score}"
@@ -127,6 +132,7 @@ class NotificationAttempt(models.Model):
 
     def __str__(self):
         return f"Notified {self.subscription.user.username} for {self.subscription.event.title} at {self.created}"
+
 
 class PowerUser(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)

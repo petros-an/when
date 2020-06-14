@@ -8,9 +8,10 @@ from rest_framework.exceptions import PermissionDenied
 from app.models import When, Event, PowerUser
 from app.serializers.whens import WhenRetrieveSerializer, WhenCreateSerializer, WhenUpdateSerializer
 from app.tasks import initiate_notifications_for_prevalent_when_change
+from app.views.mixins import AllowAnyForRead
 
 
-class EventWhenViewset(viewsets.ModelViewSet):
+class EventWhenViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
     serializer_class = WhenRetrieveSerializer
 
