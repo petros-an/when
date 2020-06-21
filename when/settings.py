@@ -108,7 +108,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER', "postgres"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", "when"),
         'HOST': os.getenv("POSTGRES_HOST", "localhost"),
-        'PORT': os.getenv("POSTGRES_PORT", 5432),
+        'PORT': os.getenv("POSTGRES_PORT", 54321),
     }
 }
 
@@ -131,6 +131,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -163,3 +169,11 @@ REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 CELERY_BROKER_URL = BROKER_URL = f"redis://{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
 
 CELERY_ALWAYS_EAGER = CELERY_TASK_ALWAYS_EAGER = True
+
+AUTHENTICATION_BACKENDS = (
+ # Needed to login by username in Django admin, regardless of `allauth`
+ "django.contrib.auth.backends.ModelBackend",
+
+ # `allauth` specific authentication methods, such as login by e-mail
+ "allauth.account.auth_backends.AuthenticationBackend",
+)

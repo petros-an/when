@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 
 from app.models import When
@@ -22,20 +24,79 @@ class WhenStringSerializer(serializers.ModelSerializer):
         fields = ["when"]
 
 
+
+
 class WhenCreateSerializer(serializers.ModelSerializer):
-    when = serializers.DateTimeField()
+    when = serializers.JSONField()
     description = serializers.CharField(max_length=200)
-    sources = serializers.JSONField()
-    specificity = serializers.ChoiceField(choices=When.specificity_choices)
+
+    @staticmethod
+    def first_month_of_season(season):
+        try:
+            return {
+                "spring": 3,
+                "winter": 12,
+                "summer": 6,
+                "fall": 9
+            }[season]
+        except KeyError:
+            raise serializers.ValidationError("unknown season")
+
+    def validate_when(self, when):
+        values = {
+            "year": None,
+            "season": None,
+            "month": None,
+            "day": None
+        }
+        specificity = "year"
+        for interval in values.keys():
+            value = when.get(interval)
+            if value:
+                specificity = interval
+                values[interval] = value
+            else:
+                break
+        try:
+            if specificity == "season":
+                dt = datetime.datetime(
+                    year=int(values.get("year", 0)),
+                    month=self.first_month_of_season(values['season']),
+                    day=0
+                )
+            else:
+                dt = datetime.datetime(
+                    year=int(values.get("year", 1) or 1),
+                    month=int(values.get("month", 1) or 1),
+                    day=int(values.get("day", 1) or 1)
+                )
+        except ValueError:
+            raise serializers.ValidationError("Invalid date")
+        now = datetime.datetime.now()
+        try:
+            if specificity == 'year':
+                assert dt.year >= now.year
+            elif specificity == 'month':
+                assert dt.year >= now.year and dt.month >= now.month
+            elif specificity == 'season':
+                assert dt.year >= now.year and self.first_month_of_season(values["season"]) >= now.month
+            elif specificity == 'day':
+                assert dt.year >= now.year and dt.month >= now.month and dt.day > now.day
+
+        except AssertionError:
+            raise serializers.ValidationError("Date must be in the future")
+        self.specificity = specificity
+        return dt
 
     def create(self, validated_data):
+        validated_data["specificity"] = self.specificity
         validated_data["event_id"] = self.context["view"].kwargs["event_pk"]
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
     class Meta:
         model = When
-        fields = ["when", "description", "sources", "specificity"]
+        fields = ["when", "description", "specificity"]
 
 
 class WhenUpdateSerializer(serializers.ModelSerializer):

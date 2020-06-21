@@ -1,0 +1,183 @@
+[
+  {
+    "model": "app.category",
+    "pk": 1,
+    "fields": {
+      "title": "Films",
+      "slug": "films",
+      "description": "films",
+      "created": "2020-05-30T11:57:57.274Z",
+      "parent": null
+    }
+  },
+  {
+    "model": "app.category",
+    "pk": 2,
+    "fields": {
+      "title": "Shows",
+      "slug": "shows",
+      "description": "shows",
+      "created": "2020-05-30T11:58:30.782Z",
+      "parent": null
+    }
+  },
+  {
+    "model": "app.category",
+    "pk": 3,
+    "fields": {
+      "title": "Music",
+      "slug": "music",
+      "description": "music",
+      "created": "2020-05-30T11:58:45.495Z",
+      "parent": null
+    }
+  },
+  {
+    "model": "app.category",
+    "pk": 4,
+    "fields": {
+      "title": "Gaming",
+      "slug": "gaming",
+      "description": "gaming",
+      "created": "2020-05-30T11:59:06.877Z",
+      "parent": null
+    }
+  },
+  {
+    "model": "app.category",
+    "pk": 5,
+    "fields": {
+      "title": "Tech",
+      "slug": "tech",
+      "description": "tech",
+      "created": "2020-05-30T11:59:36.690Z",
+      "parent": null
+    }
+  },
+  {
+    "model": "app.category",
+    "pk": 6,
+    "fields": {
+      "title": "Books",
+      "slug": "books",
+      "description": "books",
+      "created": "2020-05-30T12:00:26.456Z",
+      "parent": null
+    }
+  },
+  {
+    "model": "app.event",
+    "pk": 1,
+    "fields": {
+      "title": "Black Widow (2020)",
+      "description": "Black Widow is an upcoming American superhero film based on the Marvel Comics character of the same name.",
+      "info": {},
+      "user": 1,
+      "prevalent_when": 1,
+      "created": "2020-06-11T15:34:09.847Z",
+      "score": 0,
+      "category": "films",
+      "status": "accepted",
+      "image": "blackwidow_pd6xAPj.jpg"
+    }
+  },
+  {
+    "model": "app.event",
+    "pk": 2,
+    "fields": {
+      "title": "Fargo, season 4",
+      "description": "The fourth season of Fargo, an American anthology black comedy–crime drama television series created by Noah Hawley.",
+      "info": {},
+      "user": 1,
+      "prevalent_when": null,
+      "created": "2020-06-11T15:34:58.826Z",
+      "score": 0,
+      "category": "shows",
+      "status": "accepted",
+      "image": "fargo_9gxAyG6.jpg"
+    }
+  },
+  {
+    "model": "app.event",
+    "pk": 3,
+    "fields": {
+      "title": "Thor: Love and Thunder",
+      "description": "Not much known",
+      "info": {},
+      "user": 1,
+      "prevalent_when": 3,
+      "created": "2020-06-11T16:41:16.819Z",
+      "score": 0,
+      "category": "films",
+      "status": "accepted",
+      "image": "thor_lat.jpeg"
+    }
+  },
+  {
+    "model": "app.event",
+    "pk": 4,
+    "fields": {
+      "title": "The Walking Dead Season 10 Episode 16",
+      "description": "THE WALKING DEAD SEASON 10, episode 16 will mark the finale with the show due to come to an end very soon",
+      "info": {},
+      "user": 1,
+      "prevalent_when": 2,
+      "created": "2020-06-11T16:43:23.254Z",
+      "score": 0,
+      "category": "shows",
+      "status": "accepted",
+      "image": "twd_finale.jpeg"
+    }
+  },
+  {
+    "model": "app.when",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "description": "Read it on Wikipedia",
+      "event": 1,
+      "created": "2020-06-11T15:36:19.542Z",
+      "sources": "[]",
+      "score": 0,
+      "chosen": false,
+      "confidence": "certainly",
+      "status": "accepted",
+      "when": "2020-11-06T15:36:17Z",
+      "specificity": "day"
+    }
+  },
+  {
+    "model": "app.when",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "description": "It says \"Later in 2020\"",
+      "event": 4,
+      "created": "2020-06-13T10:19:44.416Z",
+      "sources": "[]",
+      "score": 0,
+      "chosen": false,
+      "confidence": "maybe",
+      "status": "accepted",
+      "when": "2020-09-16T10:18:20Z",
+      "specificity": "season"
+    }
+  },
+  {
+    "model": "app.when",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "description": "From wiki",
+      "event": 3,
+      "created": "2020-06-13T10:21:41.761Z",
+      "sources": "[]",
+      "score": 0,
+      "chosen": false,
+      "confidence": "probably",
+      "status": "accepted",
+      "when": "2021-02-11T10:21:38Z",
+      "specificity": "day"
+    }
+  }
+]

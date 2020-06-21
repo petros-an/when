@@ -79,9 +79,17 @@ class WhenComment(models.Model):
 
 
 class Vote(models.Model):
+    SENTIMENTS = (
+        ('up', 'Up'),
+        ('down', 'Down')
+    )
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     when = models.ForeignKey(to="When", related_name='votes', on_delete=models.CASCADE)
+    sentiment = models.CharField(choices=SENTIMENTS, max_length=100, default='up')
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "when")
 
     def __str__(self):
         verb = "Approves"
@@ -112,7 +120,7 @@ class When(models.Model):
     description = models.TextField()
     event = models.ForeignKey(to=Event, related_name='whens', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    sources = ArrayField(default=list, base_field=models.URLField(), blank=True)
+    sources = ArrayField(default=list, base_field=models.URLField(), blank=True, null=True)
     score = models.FloatField(default=0)
     chosen = models.BooleanField(default=False)
     confidence = models.CharField(max_length=40, choices=confidence_choices, default='probably')

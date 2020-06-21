@@ -30,7 +30,7 @@ services:
       - when-network
     ports:
       - 8000:8000
-    command: python manage.py runserver 0.0.0.0:8000
+    command: pipenv run python manage.py runserver 0.0.0.0:8000
     environment:
         POSTGRES_HOST: ${POSTGRES_HOST}
         POSTGRES_USER: ${POSTGRES_USER}
