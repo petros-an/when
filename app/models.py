@@ -51,7 +51,15 @@ class Subscription(models.Model):
     SUBSCRIPTION_CHOICES = (
         ('email', 'Email'),
     )
-
+    NOTIFICATION_INTERVALS = [
+            '1day',
+            '3days',
+            '1week',
+            '2weeks',
+            '1month',
+            '2months',
+            '4months',
+        ]
     default_subscription_config = {}
     user = models.ForeignKey(to=User, related_name='user_subscriptions', on_delete=models.CASCADE)
     config = JSONField(default=dict)

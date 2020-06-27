@@ -20,6 +20,14 @@ whens_router.register(r'whens', views.EventWhenViewset, basename='event-whens')
 votes_router = routers.NestedSimpleRouter(whens_router, r'whens', lookup='when')
 votes_router.register(r'votes',  views.WhenVotesViewset, basename='when-votes')
 
+subscriptions_router = DefaultRouter()
+subscriptions_router.register(
+    'subscriptions', views.SubscriptionViewSet, basename='subscription'
+)
+
+event_subscriptions_router = routers.NestedSimpleRouter(router, r'events', lookup='event')
+event_subscriptions_router.register(r'subscriptions', views.EventSubscriptionViewSet, basename='event-subscriptions')
+
 when_comments_router = routers.NestedSimpleRouter(whens_router, r'whens', lookup='when')
 when_comments_router.register(r'comments',  views.WhenCommentsViewSet, basename='when-comments')
 urlpatterns = [
@@ -30,5 +38,7 @@ urlpatterns = [
     path('', include(whens_router.urls)),
     path('', include(votes_router.urls)),
     path('', include(when_comments_router.urls)),
+    path('', include(subscriptions_router.urls)),
+    path('', include(event_subscriptions_router.urls)),
 ]
 

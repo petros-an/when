@@ -9,7 +9,10 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     prevalent_when = serializers.SerializerMethodField()
 
     def get_prevalent_when(self, obj):
-        return WhenRetrieveSerializer(context=self.context).to_representation(obj.prevalent_when)
+        try:
+            return WhenRetrieveSerializer(context=self.context).to_representation(obj.prevalent_when)
+        except AttributeError:
+            return None
 
     def get_whens(self, obj):
         return WhenRetrieveSerializer(many=True, context=self.context).to_representation(obj.whens)
