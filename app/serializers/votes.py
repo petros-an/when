@@ -19,20 +19,21 @@ class VoteCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         sentiment = validated_data['sentiment']
+        increment = 1 if sentiment == 'up' else -1
         try:
-            vote, created = Vote.objects.update_or_create(
+            vote = Vote.objects.get(
                 user=validated_data['user'],
                 when_id=self.context['when_id'],
-                defaults={'sentiment': sentiment}
             )
-        except IntegrityError:
-            return Vote.objects.get(
-                user_id=validated_data['user'].id,
+            if vote.sentiment != sentiment:
+                vote.sentiment = sentiment
+                vote.save()
+                When.objects.filter(id=self.context['when_id']).update(score=F('score') + increment * 2)
+        except Vote.DoesNotExist:
+            vote = Vote.objects.create(
+                user=validated_data['user'],
                 when_id=self.context['when_id'],
                 sentiment=sentiment
             )
-        if sentiment == 'up':
-            When.objects.filter(id=self.context['when_id']).update(score=F('score') + 1)
-        else:
-            When.objects.filter(id=self.context['when_id']).update(score=F('score') - 1)
+            When.objects.filter(id=self.context['when_id']).update(score=F('score') + increment)
         return vote

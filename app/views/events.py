@@ -1,5 +1,5 @@
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Prefetch, Count, Q
+from django.db.models import Prefetch, Count, Q, Exists, OuterRef
 from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
@@ -7,7 +7,7 @@ from rest_framework.decorators import action, authentication_classes, permission
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 
-from app.models import Event, When
+from app.models import Event, When, Vote
 from app.serializers.events import EventRetrieveSerializer, EventCreateSerializer, EventUpdateSerializer, \
     EventAutocompleteSerializer
 from app.views.mixins import AllowAnyForRead
@@ -16,10 +16,11 @@ from app.views.mixins import AllowAnyForRead
 class EventViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
     def get_queryset(self):
+        prefetch_qs = When.objects.filter(status='accepted')
         qs = Event.objects.filter(status='accepted').prefetch_related(
             Prefetch(
                 'whens',
-                queryset=When.objects.filter(status='accepted')
+                queryset=prefetch_qs
             )
         )
         category = self.kwargs.get('category')
@@ -58,6 +59,8 @@ class EventSearchView(AllowAnyForRead, ListAPIView):
 
     def get_queryset(self):
         search = self.request.GET.get("term")
+        if not search:
+            return Event.objects.none()
         queryset = Event.objects.annotate(
             search=SearchVector('description', 'title'),
         ).filter(Q(search=search) | Q(title__istartswith=search))

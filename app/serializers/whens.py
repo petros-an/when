@@ -2,14 +2,29 @@ import datetime
 
 from rest_framework import serializers
 
-from app.models import When
+from app.models import When, Vote
 
 
 class WhenRetrieveSerializer(serializers.ModelSerializer):
-    when = serializers.SerializerMethodField(method_name="get_when")
+    when = serializers.SerializerMethodField()
+    voted = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context['request']
+        if request.user.is_authenticated:
+            votes = Vote.objects.filter(user_id=request.user.id).values_list("when_id", "sentiment")
+            self.votes = {}
+            for when_id, sentiment in votes:
+                self.votes[when_id] = sentiment
+        else:
+            self.votes = {}
 
     def get_when(self, obj):
         return int(obj.when.timestamp())
+
+    def get_voted(self, obj):
+        return self.votes.get(obj.id, None)
 
     class Meta:
         model = When

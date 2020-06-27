@@ -5,8 +5,14 @@ from app.serializers.whens import WhenRetrieveSerializer
 
 
 class EventRetrieveSerializer(serializers.ModelSerializer):
-    whens = WhenRetrieveSerializer(many=True)
-    prevalent_when = WhenRetrieveSerializer()
+    whens = serializers.SerializerMethodField()
+    prevalent_when = serializers.SerializerMethodField()
+
+    def get_prevalent_when(self, obj):
+        return WhenRetrieveSerializer(context=self.context).to_representation(obj.prevalent_when)
+
+    def get_whens(self, obj):
+        return WhenRetrieveSerializer(many=True, context=self.context).to_representation(obj.whens)
 
     class Meta:
         model = Event

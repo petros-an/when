@@ -1,11 +1,12 @@
 from django.contrib.postgres.search import SearchVector
+from django.db.models import Exists, OuterRef
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 
-from app.models import When, Event, PowerUser
+from app.models import When, Event, PowerUser, Vote
 from app.serializers.whens import WhenRetrieveSerializer, WhenCreateSerializer, WhenUpdateSerializer
 from app.tasks import initiate_notifications_for_prevalent_when_change
 from app.views.mixins import AllowAnyForRead
@@ -13,10 +14,18 @@ from app.views.mixins import AllowAnyForRead
 
 class EventWhenViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
-    serializer_class = WhenRetrieveSerializer
-
     def get_queryset(self):
-        return When.objects.filter(event_id=self.kwargs["event_pk"])
+        qs = When.objects.filter(event_id=self.kwargs["event_pk"])
+        if self.request.user.is_authenticated:
+            qs = qs.annotate(
+                voted=Exists(
+                    Vote.objects.filter(
+                        user_id=self.request.user.id,
+                        when_id=OuterRef("id")
+                    )
+                )
+            )
+        return qs
 
     def get_serializer(self, *args, **kwargs):
         context = self.get_serializer_context()
