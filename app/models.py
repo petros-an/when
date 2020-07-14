@@ -21,6 +21,7 @@ class Category(models.Model):
 
 class Event(models.Model):
     status_choices = (
+        ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('flagged', 'Flagged'),
         ('deleted', 'Deleted')
@@ -35,7 +36,7 @@ class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     score = models.FloatField(default=0)
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, null=True, to_field="slug")
-    status = models.CharField(max_length=50, choices=status_choices, default='accepted')
+    status = models.CharField(max_length=50, choices=status_choices, default='pending')
     image = models.ImageField(null=True, blank=True)
 
     class Meta:
@@ -60,15 +61,17 @@ class Subscription(models.Model):
             '2months',
             '4months',
         ]
-    default_subscription_config = {}
     user = models.ForeignKey(to=User, related_name='user_subscriptions', on_delete=models.CASCADE)
-    config = JSONField(default=dict)
+    config = JSONField(default=dict, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     event = models.ForeignKey(to=Event, related_name='event_subscriptions', on_delete=models.CASCADE)
     method = models.CharField(max_length=100, choices=SUBSCRIPTION_CHOICES)
 
     def __str__(self):
         return f"{self.user.username} is subscribed to {self.event.title} "
+
+    class Meta:
+        unique_together = ["user", "event"]
 
 
 class Comment(models.Model):

@@ -11,7 +11,7 @@ class SubscriptionViewSet(GenericViewSet, ListModelMixin):
     def get_queryset(self):
         return Subscription.objects.filter(
             user_id=self.request.user.id
-        )
+        ).order_by("-created")
 
 
 class EventSubscriptionViewSet(GenericViewSet, CreateModelMixin):
@@ -25,3 +25,5 @@ class EventSubscriptionViewSet(GenericViewSet, CreateModelMixin):
             'event_id': self.kwargs['event_pk']
         })
         return parent
+
+

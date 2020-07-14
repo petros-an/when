@@ -1,19 +1,24 @@
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Prefetch, Count, Q, Exists, OuterRef
-from django.http import JsonResponse
+from django.db.models import Prefetch, Q
 from rest_framework import viewsets
-from rest_framework.authentication import BasicAuthentication, TokenAuthentication
-from rest_framework.decorators import action, authentication_classes, permission_classes
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework import parsers
 from rest_framework.permissions import AllowAny
 
-from app.models import Event, When, Vote
+from app.models import Event, When
 from app.serializers.events import EventRetrieveSerializer, EventCreateSerializer, EventUpdateSerializer, \
-    EventAutocompleteSerializer
+    EventAutocompleteSerializer, EventDetailSerializer
 from app.views.mixins import AllowAnyForRead
 
 
-class EventViewset(AllowAnyForRead, viewsets.ModelViewSet):
+#
+# class EventCreateView(CreateAPIView):
+#     queryset = Event.objects.all()
+#     parser_classes = ()
+#
+
+class EventViewSet(AllowAnyForRead, viewsets.ModelViewSet):
+    parser_classes = (parsers.JSONParser, parsers.MultiPartParser)
 
     def get_queryset(self):
         prefetch_qs = When.objects.filter(status='accepted')
@@ -30,8 +35,10 @@ class EventViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
     def get_serializer(self, *args, **kwargs):
         context = self.get_serializer_context()
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action == 'list':
             return EventRetrieveSerializer(*args, **kwargs, context=context)
+        elif self.action == 'retrieve':
+            return EventDetailSerializer(*args, **kwargs, context=context)
         elif self.action == 'create':
             return EventCreateSerializer(*args, **kwargs, context=context)
         elif self.action == 'update' or self.action == 'partial_update':

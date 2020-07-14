@@ -36,11 +36,16 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
         return res
 
     def create(self, validated_data):
-        validated_data.update({
-            "user": self.context['request'].user,
-            "event_id": self.context["event_id"],
-        })
+        user_id, event_id = self.context['request'].user.id, self.context['event_id']
         try:
-            return super().create(validated_data)
+            sub, _ = Subscription.objects.update_or_create(
+                user_id=user_id,
+                event_id=event_id,
+                defaults={
+                    "config": validated_data["config"],
+                    "method": validated_data["method"]
+                }
+            )
+            return sub
         except IntegrityError:
             raise serializers.ValidationError("Event not found")

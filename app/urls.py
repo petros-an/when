@@ -10,7 +10,7 @@ router.register(
     'categories', views.CategoriesViewset, basename='categories'
 )
 router.register(
-    'events', views.EventViewset, basename='events'
+    'events', views.EventViewSet, basename='events'
 )
 
 

@@ -1,7 +1,13 @@
 from rest_framework import serializers
 
-from app.models import Event, Category
+from app.models import Event, Category, Subscription
 from app.serializers.whens import WhenRetrieveSerializer
+
+
+class SubscriptionRetrieveSerializerNoEvent(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = ["config", "method"]
 
 
 class EventRetrieveSerializer(serializers.ModelSerializer):
@@ -22,6 +28,26 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class EventDetailSerializer(EventRetrieveSerializer):
+    subscription = serializers.SerializerMethodField()
+
+    def get_subscription(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            try:
+                subscription = Subscription.objects.get(
+                    user_id=user.id,
+                    event_id=obj.id
+                )
+            except Subscription.DoesNotExist:
+                return None
+            return SubscriptionRetrieveSerializerNoEvent(
+                context=self.context
+            ).to_representation(subscription)
+        else:
+            return None
+
+
 class EventAutocompleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
@@ -29,6 +55,8 @@ class EventAutocompleteSerializer(serializers.ModelSerializer):
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(queryset=Category.objects.all(), slug_field="slug")
+    image = serializers.ImageField(required=True)
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
@@ -36,7 +64,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ["title", "description", "category"]
+        fields = ["title", "description", "category", "image"]
 
 
 class EventUpdateSerializer(serializers.ModelSerializer):
