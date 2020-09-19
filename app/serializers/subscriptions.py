@@ -27,12 +27,11 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
         for key, value in config.items():
             try:
                 assert key in notification_intervals
-                assert value
                 res[key] = value
             except AssertionError:
                 raise serializers.ValidationError(f"Config '{key}:{value}' not understood")
-        if not res:
-            raise serializers.ValidationError(f"At least one of {notification_intervals} must be provided")
+        if not any(res.values()):
+            raise serializers.ValidationError(f"At least one of {', '.join(notification_intervals)} must be provided")
         return res
 
     def create(self, validated_data):

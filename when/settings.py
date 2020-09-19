@@ -43,7 +43,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    # 'EXCEPTION_HANDLER': 'app.exceptions.error_display_exception_handler'
 }
 
 # Application definition

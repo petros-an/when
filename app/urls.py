@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 
 from app import views
-from app.views import EventAutocompleteView, EventSearchView
+from app.views import EventAutocompleteView, EventSearchView, SubmittedEventsView
 
 router = DefaultRouter()
 router.register(
@@ -33,6 +33,7 @@ when_comments_router.register(r'comments',  views.WhenCommentsViewSet, basename=
 urlpatterns = [
     path('events/autocomplete/', EventAutocompleteView.as_view()),
     path('events/search/', EventSearchView.as_view()),
+    path('events/submitted/', SubmittedEventsView.as_view()),
     path('', views.hello ),
     path('', include(router.urls)),
     path('', include(whens_router.urls)),

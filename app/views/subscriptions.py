@@ -3,6 +3,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from app.models import Subscription
 from app.serializers.subscriptions import SubscriptionRetrieveSerializer, SubscriptionCreateSerializer
+from app.views.mixins import DisplayErrorMixin
 
 
 class SubscriptionViewSet(GenericViewSet, ListModelMixin):
@@ -14,7 +15,7 @@ class SubscriptionViewSet(GenericViewSet, ListModelMixin):
         ).order_by("-created")
 
 
-class EventSubscriptionViewSet(GenericViewSet, CreateModelMixin):
+class EventSubscriptionViewSet(DisplayErrorMixin, GenericViewSet, CreateModelMixin):
 
     serializer_class = SubscriptionCreateSerializer
     queryset = Subscription.objects.all()

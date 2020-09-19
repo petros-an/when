@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from when import settings
-rest_auth.views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/rest-auth/registration/', include('rest_auth.registration.urls')),

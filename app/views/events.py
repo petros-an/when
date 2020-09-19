@@ -11,12 +11,6 @@ from app.serializers.events import EventRetrieveSerializer, EventCreateSerialize
 from app.views.mixins import AllowAnyForRead
 
 
-#
-# class EventCreateView(CreateAPIView):
-#     queryset = Event.objects.all()
-#     parser_classes = ()
-#
-
 class EventViewSet(AllowAnyForRead, viewsets.ModelViewSet):
     parser_classes = (parsers.JSONParser, parsers.MultiPartParser)
 
@@ -74,3 +68,11 @@ class EventSearchView(AllowAnyForRead, ListAPIView):
         return queryset
 
     serializer_class = EventRetrieveSerializer
+
+
+class SubmittedEventsView(ListAPIView):
+
+    serializer_class = EventRetrieveSerializer
+
+    def get_queryset(self):
+        return Event.objects.filter(user_id=self.request.user.id)

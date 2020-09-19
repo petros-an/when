@@ -56,7 +56,10 @@ class EventAutocompleteSerializer(serializers.ModelSerializer):
 
 class EventCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(queryset=Category.objects.all(), slug_field="slug")
-    image = serializers.ImageField(required=True)
+    image = serializers.ImageField(required=False, allow_null=True, )
+
+    def validate_image(self, img):
+        pass
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
