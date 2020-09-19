@@ -24,6 +24,7 @@ class Event(models.Model):
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('flagged', 'Flagged'),
+        ('rejected', 'Rejected'),
         ('deleted', 'Deleted')
     )
 
