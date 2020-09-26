@@ -44,9 +44,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+
+
     # 'EXCEPTION_HANDLER': 'app.exceptions.error_display_exception_handler'
 }
-
+REST_AUTH_SERIALIZERS = {
+    "TOKEN_SERIALIZER": "app.serializers.auth.CustomTokenSerializer"
+}
 # Application definition
 
 INSTALLED_APPS = [
@@ -172,9 +176,16 @@ CELERY_BROKER_URL = BROKER_URL = f"redis://{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_
 CELERY_ALWAYS_EAGER = CELERY_TASK_ALWAYS_EAGER = True
 
 AUTHENTICATION_BACKENDS = (
- # Needed to login by username in Django admin, regardless of `allauth`
- "django.contrib.auth.backends.ModelBackend",
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
 
- # `allauth` specific authentication methods, such as login by e-mail
- "allauth.account.auth_backends.AuthenticationBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+
 )
+
+
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = False
+
