@@ -1,5 +1,5 @@
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Count
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import parsers
@@ -15,7 +15,7 @@ class EventViewSet(AllowAnyForRead, viewsets.ModelViewSet):
     parser_classes = (parsers.JSONParser, parsers.MultiPartParser)
 
     def get_queryset(self):
-        prefetch_qs = When.objects.filter(status='accepted')
+        prefetch_qs = When.objects.filter(status='accepted').annotate(comment_count=Count("when_comments"))
         qs = Event.objects.filter(status='accepted').prefetch_related(
             Prefetch(
                 'whens',

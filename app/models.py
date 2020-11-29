@@ -1,8 +1,8 @@
-from django.contrib.postgres.fields import JSONField, ArrayField
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.db.models import CheckConstraint, Q, UniqueConstraint, JSONField
 
 
 class Category(models.Model):

@@ -1,9 +1,6 @@
 from datetime import timedelta
-
-from celery import task
 import logging
 from app.celery import app as celery_app
-from django.db.models import F, Func, OuterRef, Q
 from django.utils import timezone
 
 log = logging.getLogger(__name__)

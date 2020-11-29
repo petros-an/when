@@ -1,5 +1,5 @@
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Count
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
@@ -15,7 +15,7 @@ from app.views.mixins import AllowAnyForRead
 class EventWhenViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
     def get_queryset(self):
-        qs = When.objects.filter(event_id=self.kwargs["event_pk"])
+        qs = When.objects.filter(event_id=self.kwargs["event_pk"]).annotate(comment_count=Count("comments"))
         if self.request.user.is_authenticated:
             qs = qs.annotate(
                 voted=Exists(

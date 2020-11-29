@@ -8,6 +8,11 @@ from app.models import When, Vote
 class WhenRetrieveSerializer(serializers.ModelSerializer):
     when = serializers.SerializerMethodField()
     voted = serializers.SerializerMethodField()
+    created = serializers.SerializerMethodField()
+    comment_count = serializers.IntegerField()
+
+    def get_created(self, obj):
+        return obj.created.timestamp()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

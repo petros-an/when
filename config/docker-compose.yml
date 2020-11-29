@@ -1,6 +1,6 @@
 version: "3"
 services:
-  database:
+  when-database:
     image: postgres:9.5
     hostname: ${POSTGRES_HOST}
     container_name: when-database

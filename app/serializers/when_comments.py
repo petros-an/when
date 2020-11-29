@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from app.models import WhenComment
+from app.serializers.auth import UserSerializerMini
 
 
 class WhenCommentCreateSerializer(serializers.ModelSerializer):
@@ -15,7 +16,14 @@ class WhenCommentCreateSerializer(serializers.ModelSerializer):
         })
         return super().create(validated_data)
 
+
 class WhenCommentRetrieveSerializer(serializers.ModelSerializer):
+    user = UserSerializerMini()
+
+    created = serializers.SerializerMethodField()
+    def get_created(self, obj):
+        return obj.created.timestamp() * 1000
+
     class Meta:
         model = WhenComment
-        fields = "__all__"
+        fields = ["created", "text", "id", "user"]
