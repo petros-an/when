@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 
-from app.models import When, Event, PowerUser, Vote
+from app.models import Proposition, Event, PowerUser, Vote
 from app.serializers.whens import WhenRetrieveSerializer, WhenCreateSerializer, WhenUpdateSerializer
 from app.tasks import initiate_notifications_for_prevalent_when_change
 from app.views.mixins import AllowAnyForRead
@@ -15,7 +15,7 @@ from app.views.mixins import AllowAnyForRead
 class EventWhenViewset(AllowAnyForRead, viewsets.ModelViewSet):
 
     def get_queryset(self):
-        qs = When.objects.filter(event_id=self.kwargs["event_pk"]).annotate(comment_count=Count("comments"))
+        qs = Proposition.objects.filter(event_id=self.kwargs["event_pk"]).annotate(comment_count=Count("comments"))
         if self.request.user.is_authenticated:
             qs = qs.annotate(
                 voted=Exists(
@@ -39,16 +39,16 @@ class EventWhenViewset(AllowAnyForRead, viewsets.ModelViewSet):
     @action(detail=True, methods=["POST"], url_path="choose")
     def choose(self, request, *args, **kwargs):
         try:
-            when = When.objects.select_related("event").get(
+            when = Proposition.objects.select_related("event").get(
                 event_id=self.kwargs["event_pk"],
                 id=self.kwargs["pk"]
             )
-        except When.DoesNotExist:
+        except Proposition.DoesNotExist:
             raise Http404
 
         # if not PowerUser.objects.filter(user_id=request.user_id).exists():
         #     raise PermissionDenied("Only Power users can choose")
-        when.event.prevalent_when = when
+        when.event.prevalent_proposition = when
         when.event.save()
         initiate_notifications_for_prevalent_when_change.apply_async(when.event.id)
         return JsonResponse(status=200, data={})

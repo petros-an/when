@@ -16,7 +16,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
 
     def get_prevalent_when(self, obj):
         try:
-            return WhenRetrieveSerializer(context=self.context).to_representation(obj.prevalent_when)
+            return WhenRetrieveSerializer(context=self.context).to_representation(obj.prevalent_proposition)
         except AttributeError:
             return None
 
@@ -57,6 +57,9 @@ class EventAutocompleteSerializer(serializers.ModelSerializer):
 class EventCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(queryset=Category.objects.all(), slug_field="slug")
     image = serializers.ImageField(required=False, allow_null=True, )
+    description = serializers.CharField(required=True, min_length=30, max_length=300)
+    title = serializers.CharField(required=True, min_length=10, max_length=50)
+
 
     def validate_image(self, img):
         pass

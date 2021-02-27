@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework import serializers
 
-from app.models import When, Vote
+from app.models import Proposition, Vote
 
 
 class WhenRetrieveSerializer(serializers.ModelSerializer):
@@ -10,6 +10,7 @@ class WhenRetrieveSerializer(serializers.ModelSerializer):
     voted = serializers.SerializerMethodField()
     created = serializers.SerializerMethodField()
     comment_count = serializers.IntegerField()
+    title = serializers.CharField()
 
     def get_created(self, obj):
         return obj.created.timestamp()
@@ -32,7 +33,7 @@ class WhenRetrieveSerializer(serializers.ModelSerializer):
         return self.votes.get(obj.id, None)
 
     class Meta:
-        model = When
+        model = Proposition
         fields = '__all__'
 
 
@@ -40,15 +41,14 @@ class WhenStringSerializer(serializers.ModelSerializer):
     when = serializers.DateTimeField()
 
     class Meta:
-        model = When
+        model = Proposition
         fields = ["when"]
-
-
 
 
 class WhenCreateSerializer(serializers.ModelSerializer):
     when = serializers.JSONField()
     description = serializers.CharField(max_length=200)
+    title = serializers.CharField(max_length=100)
 
     @staticmethod
     def first_month_of_season(season):
@@ -115,14 +115,15 @@ class WhenCreateSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     class Meta:
-        model = When
-        fields = ["when", "description", "specificity"]
+        model = Proposition
+        fields = ["when", "description", "specificity", "title"]
 
 
 class WhenUpdateSerializer(serializers.ModelSerializer):
     when = serializers.DateTimeField()
     description = serializers.CharField(max_length=200, required=False)
     sources = serializers.JSONField(required=False)
+    title = serializers.CharField(max_length=100)
 
     def update(self, instance, validated_data):
         if self.context['request'].user.id != instance.user_id:
@@ -130,5 +131,5 @@ class WhenUpdateSerializer(serializers.ModelSerializer):
         super().update(instance, validated_data)
 
     class Meta:
-        model = When
+        model = Proposition
         fields = ["when", "description", "sources"]

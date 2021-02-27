@@ -129,6 +129,7 @@ class When(models.Model):
     )
 
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=120)
     description = models.TextField()
     event = models.ForeignKey(to=Event, related_name='whens', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
@@ -157,3 +158,8 @@ class NotificationAttempt(models.Model):
 class PowerUser(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+
+Item = Event
+
+Proposition = When
+PropositionComment = WhenComment

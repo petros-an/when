@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from app.models import WhenComment
+from app.models import PropositionComment
 from app.serializers.auth import UserSerializerMini
 
 
 class WhenCommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WhenComment
+        model = PropositionComment
         fields = ["text"]
 
     def create(self, validated_data):
@@ -25,5 +25,5 @@ class WhenCommentRetrieveSerializer(serializers.ModelSerializer):
         return obj.created.timestamp() * 1000
 
     class Meta:
-        model = WhenComment
+        model = PropositionComment
         fields = ["created", "text", "id", "user"]

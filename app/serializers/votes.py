@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.db.models import F
 from rest_framework import serializers
 
-from app.models import Vote, When
+from app.models import Vote, Proposition
 
 
 class VoteRetrieveSerializer(serializers.ModelSerializer):
@@ -28,12 +28,12 @@ class VoteCreateSerializer(serializers.ModelSerializer):
             if vote.sentiment != sentiment:
                 vote.sentiment = sentiment
                 vote.save()
-                When.objects.filter(id=self.context['when_id']).update(score=F('score') + increment * 2)
+                Proposition.objects.filter(id=self.context['when_id']).update(score=F('score') + increment * 2)
         except Vote.DoesNotExist:
             vote = Vote.objects.create(
                 user=validated_data['user'],
                 when_id=self.context['when_id'],
                 sentiment=sentiment
             )
-            When.objects.filter(id=self.context['when_id']).update(score=F('score') + increment)
+            Proposition.objects.filter(id=self.context['when_id']).update(score=F('score') + increment)
         return vote
