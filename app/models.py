@@ -159,7 +159,6 @@ class PowerUser(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
-Item = Event
+Topic = Event
 
-Proposition = When
-PropositionComment = WhenComment
+Update = When

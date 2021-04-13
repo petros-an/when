@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework import parsers
 from rest_framework.permissions import AllowAny
 
-from app.models import Item, Proposition
+from app.models import Topic, Update
 from app.serializers.events import EventRetrieveSerializer, EventCreateSerializer, EventUpdateSerializer, \
     EventAutocompleteSerializer, EventDetailSerializer
 from app.views.mixins import AllowAnyForRead
@@ -15,8 +15,8 @@ class EventViewSet(AllowAnyForRead, viewsets.ModelViewSet):
     parser_classes = (parsers.JSONParser, parsers.MultiPartParser)
 
     def get_queryset(self):
-        prefetch_qs = Proposition.objects.filter(Q(status='accepted') | Q(user_id=self.request.user.id)).annotate(comment_count=Count("when_comments"))
-        qs = Item.objects.filter(Q(status='accepted') | Q(user_id=self.request.user.id)).prefetch_related(
+        prefetch_qs = Update.objects.filter(Q(status='accepted') | Q(user_id=self.request.user.id)).annotate(comment_count=Count("when_comments"))
+        qs = Topic.objects.filter(Q(status='accepted') | Q(user_id=self.request.user.id)).prefetch_related(
             Prefetch(
                 'whens',
                 queryset=prefetch_qs
@@ -47,7 +47,7 @@ class EventAutocompleteView(AllowAnyForRead, ListAPIView):
 
     def get_queryset(self):
         term = self.request.GET.get("term") or ""
-        queryset = Item.objects.filter(
+        queryset = Topic.objects.filter(
             title__istartswith=term
         )
         return queryset
@@ -61,8 +61,8 @@ class EventSearchView(AllowAnyForRead, ListAPIView):
     def get_queryset(self):
         search = self.request.GET.get("term")
         if not search:
-            return Item.objects.none()
-        queryset = Item.objects.annotate(
+            return Topic.objects.none()
+        queryset = Topic.objects.annotate(
             search=SearchVector('title'),
         ).filter(Q(search=search) | Q(title__istartswith=search))
         return queryset
@@ -75,4 +75,4 @@ class SubmittedEventsView(ListAPIView):
     serializer_class = EventRetrieveSerializer
 
     def get_queryset(self):
-        return Item.objects.filter(user_id=self.request.user.id)
+        return Topic.objects.filter(user_id=self.request.user.id)

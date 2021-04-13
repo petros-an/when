@@ -5,7 +5,7 @@ from django.utils import timezone
 
 log = logging.getLogger(__name__)
 
-from app.models import Item, Subscription, NotificationAttempt, Proposition
+from app.models import Topic, Subscription, NotificationAttempt, Update
 
 SUBSCRIPTION_TIMEDELTAS = {
     '1day': timedelta(days=1),
@@ -20,17 +20,16 @@ SUBSCRIPTION_TIMEDELTAS = {
 @celery_app.task
 def initiate_due_notifications_for_all_deltas():
     for delta_name, delta_value in SUBSCRIPTION_TIMEDELTAS.items():
-        initiate_due_notifications_for_delta.apply_async((delta_name,))
+        initiate_due_notifications_for_delta.apply_async((delta_name, delta_value))
 
 @celery_app.task
-def initiate_due_notifications_for_delta(delta_name):
-    delta_value = SUBSCRIPTION_TIMEDELTAS[delta_name]
-    whens_due = Proposition.objects.prefetch_related("prevalent_when").filter(
+def initiate_due_notifications_for_delta(delta_name, delta_value):
+    updates_due = Update.objects.filter(
         when__lte=timezone.now() + delta_value,
         when__gte=timezone.now()
     )
-    for when in whens_due:
-        subscriptions = when.item.event_subscriptions.filter(
+    for update in updates_due:
+        subscriptions = update.item.event_subscriptions.filter(
             config__has_key=delta_name
         )
         for subscription in subscriptions:
@@ -59,8 +58,8 @@ def notify_subscription_for_delta(subscription_id, delta_name):
     else:
         raise NotImplementedError("Notification method not implemented")
 
-def initiate_notifications_for_prevalent_when_change(event_id):
-    event = Item.objects.select_related("prevalent_when").get(id=event_id)
+def initiate_notifications_for_update(event_id):
+    event = Topic.objects.select_related("prevalent_when").get(id=event_id)
     for subscription in event.subscriptions.filter(config__notify_on_change=True):
         notify_by_email(subscription)
 

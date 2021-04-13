@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from app.models import PropositionComment
+from app.models import WhenComment
 from app.serializers import WhenCommentRetrieveSerializer, WhenCommentCreateSerializer
 from app.views.mixins import AllowAnyForRead
 
@@ -21,7 +21,7 @@ class WhenCommentsViewSet(AllowAnyForRead, GenericViewSet, ListModelMixin, Creat
             return WhenCommentCreateSerializer
 
     def get_object(self):
-        return get_object_or_404(PropositionComment, id=self.kwargs["pk"])
+        return get_object_or_404(WhenComment, id=self.kwargs["pk"])
 
     def get_queryset(self):
-        return PropositionComment.objects.filter(when_id=self.kwargs['when_pk'])
+        return WhenComment.objects.filter(when_id=self.kwargs['when_pk'])

@@ -2,14 +2,14 @@ import datetime
 
 from rest_framework import serializers
 
-from app.models import Proposition, Vote
+from app.models import Update, Vote
 
 
 class WhenRetrieveSerializer(serializers.ModelSerializer):
     when = serializers.SerializerMethodField()
     voted = serializers.SerializerMethodField()
     created = serializers.SerializerMethodField()
-    comment_count = serializers.IntegerField()
+    # comment_count = serializers.IntegerField()
     title = serializers.CharField()
 
     def get_created(self, obj):
@@ -33,7 +33,7 @@ class WhenRetrieveSerializer(serializers.ModelSerializer):
         return self.votes.get(obj.id, None)
 
     class Meta:
-        model = Proposition
+        model = Update
         fields = '__all__'
 
 
@@ -41,7 +41,7 @@ class WhenStringSerializer(serializers.ModelSerializer):
     when = serializers.DateTimeField()
 
     class Meta:
-        model = Proposition
+        model = Update
         fields = ["when"]
 
 
@@ -115,7 +115,7 @@ class WhenCreateSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     class Meta:
-        model = Proposition
+        model = Update
         fields = ["when", "description", "specificity", "title"]
 
 
@@ -131,5 +131,5 @@ class WhenUpdateSerializer(serializers.ModelSerializer):
         super().update(instance, validated_data)
 
     class Meta:
-        model = Proposition
+        model = Update
         fields = ["when", "description", "sources"]

@@ -12,7 +12,7 @@ class SubscriptionRetrieveSerializerNoEvent(serializers.ModelSerializer):
 
 class EventRetrieveSerializer(serializers.ModelSerializer):
     whens = serializers.SerializerMethodField()
-    prevalent_when = serializers.SerializerMethodField()
+    # prevalent_when = serializers.SerializerMethodField()
 
     def get_prevalent_when(self, obj):
         try:
